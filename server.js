@@ -5,6 +5,7 @@ const knex = require('knex');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const axios = require('axios');
+require('dotenv').config();
 
 const database = knex({
   client: 'pg',
@@ -17,6 +18,7 @@ const database = knex({
   }
 })
 
+
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -27,7 +29,6 @@ app.get('/', (req, res) => {
 
 app.post('/job/search', (req, res) => {
   const { searchInput } = req.body;
-
   const options = {
     method: 'GET',
     url: 'https://jsearch.p.rapidapi.com/search',
@@ -37,7 +38,7 @@ app.post('/job/search', (req, res) => {
       num_pages: '1'
     },
     headers: {
-      'X-RapidAPI-Key': 'b3c8c7a403msh0197db5920915a7p120e2cjsn5695a0b39b2d',
+      'X-RapidAPI-Key': process.env.API_KEY,
       'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
     }
   };
@@ -65,7 +66,35 @@ app.get('/job/search/nearby', (req, res) => {
       num_pages: '1'
     },
     headers: {
-      'X-RapidAPI-Key': 'b3c8c7a403msh0197db5920915a7p120e2cjsn5695a0b39b2d',
+      'X-RapidAPI-Key': process.env.API_KEY,
+      'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.request(options);
+      const dataOfJobs = response.data.data;
+      res.json({ status: 'success', dataOfJobs })
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  return fetchData();
+})
+
+app.get('/job/search/recent', (req, res) => {
+  database('')
+  const options = {
+    method: 'GET',
+    url: 'https://jsearch.p.rapidapi.com/search',
+    params: {
+      query: 'Python developer in Texas, USA',
+      page: '1',
+      num_pages: '1'
+    },
+    headers: {
+      'X-RapidAPI-Key': process.env.API_KEY,
       'X-RapidAPI-Host': 'jsearch.p.rapidapi.com'
     }
   };
